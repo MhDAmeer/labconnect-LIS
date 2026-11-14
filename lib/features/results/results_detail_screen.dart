@@ -157,8 +157,11 @@ class _ResultsDetailScreenState extends State<ResultsDetailScreen> {
             children: [
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: (_viewing || _downloading) ? null : () => _view(data),
-                  icon: _viewing ? const _Spinner() : const Icon(Icons.picture_as_pdf_outlined),
+                  onPressed:
+                      (_viewing || _downloading) ? null : () => _view(data),
+                  icon: _viewing
+                      ? const _Spinner()
+                      : const Icon(Icons.picture_as_pdf_outlined),
                   label: const Text('View report'),
                 ),
               ),
@@ -239,6 +242,7 @@ class _PatientBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = data.patient;
     final age = Formatters.ageFrom(p.dob);
+    final accessions = data.accessions.join(', ');
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -277,9 +281,14 @@ class _PatientBanner extends StatelessWidget {
               _fact('DOB', Formatters.birthDate(p.dob)),
               _fact(
                 data.accessions.length > 1 ? 'Accessions' : 'Accession',
-                data.accessions.isEmpty ? null : data.accessions.join(', '),
+                accessions.isEmpty ? null : accessions,
+                copyValue: accessions.isEmpty ? null : accessions,
               ),
-              _fact('Encounter', data.encounterCode),
+              _fact(
+                'Encounter',
+                data.encounterCode,
+                copyValue: data.encounterCode,
+              ),
             ],
           ),
         ],
@@ -287,7 +296,7 @@ class _PatientBanner extends StatelessWidget {
     );
   }
 
-  Widget _fact(String label, String? value) {
+  Widget _fact(String label, String? value, {String? copyValue}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -297,13 +306,26 @@ class _PatientBanner extends StatelessWidget {
           style: const TextStyle(color: Color(0xFFB8C7EA), fontSize: 12),
         ),
         const SizedBox(height: 2),
-        Text(
-          (value == null || value.isEmpty) ? '-' : value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-          ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(
+              child: Text(
+                (value == null || value.isEmpty) ? '-' : value,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            if (copyValue != null && copyValue.isNotEmpty)
+              CopyIconButton(
+                value: copyValue,
+                label: label,
+                color: Colors.white,
+              ),
+          ],
         ),
       ],
     );

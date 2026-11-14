@@ -30,8 +30,9 @@ class _PatientsScreenState extends State<PatientsScreen> {
   final List<Patient> _patients = [];
   int _page = 1;
   bool _hasMore = false;
-  bool _loading = true;
+  bool _loading = false;
   bool _loadingMore = false;
+  bool _searched = false;
   String? _error;
 
   /// Bumped on every new search so a slow, old answer can't overwrite a
@@ -42,7 +43,6 @@ class _PatientsScreenState extends State<PatientsScreen> {
   void initState() {
     super.initState();
     _scroll.addListener(_onScroll);
-    _load(reset: true);
   }
 
   @override
@@ -64,12 +64,39 @@ class _PatientsScreenState extends State<PatientsScreen> {
 
   void _onSearchChanged(String _) {
     _debounce?.cancel();
+    final generation = ++_generation;
+    setState(() {
+      _patients.clear();
+      _page = 1;
+      _hasMore = false;
+      _loading = false;
+      _loadingMore = false;
+      _searched = false;
+      _error = null;
+    });
+    if (_search.text.trim().isEmpty) return;
+
     _debounce = Timer(const Duration(milliseconds: 450), () {
-      if (mounted) _load(reset: true);
+      if (mounted && generation == _generation) _load(reset: true);
     });
   }
 
   Future<void> _load({bool reset = false}) async {
+    final query = _search.text.trim();
+    if (query.isEmpty) {
+      ++_generation;
+      setState(() {
+        _patients.clear();
+        _page = 1;
+        _hasMore = false;
+        _loading = false;
+        _loadingMore = false;
+        _searched = false;
+        _error = null;
+      });
+      return;
+    }
+
     final generation = reset ? ++_generation : _generation;
     final facilityId = context.read<SessionController>().facilityId;
     final repository = context.read<PatientRepository>();
@@ -86,7 +113,7 @@ class _PatientsScreenState extends State<PatientsScreen> {
 
     try {
       final result = await repository.search(
-        search: _search.text,
+        search: query,
         facilityId: facilityId,
         page: _page,
         pageSize: _pageSize,
@@ -97,6 +124,7 @@ class _PatientsScreenState extends State<PatientsScreen> {
         _patients.addAll(result.patients);
         _hasMore = result.hasMore;
         _page += 1;
+        _searched = true;
         _loading = false;
         _loadingMore = false;
       });
@@ -146,6 +174,12 @@ class _PatientsScreenState extends State<PatientsScreen> {
 
     if (_error != null && _patients.isEmpty) {
       return ErrorView(message: _error!, onRetry: () => _load(reset: true));
+    }
+    if (!_searched) {
+      return const MessageView(
+        icon: Icons.person_search_outlined,
+        message: 'Search by name, MRN, ID or phone to find a patient.',
+      );
     }
     if (_patients.isEmpty) {
       return const MessageView(

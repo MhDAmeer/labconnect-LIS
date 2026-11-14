@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../core/theme/app_colors.dart';
 
@@ -302,4 +303,34 @@ void showMessage(BuildContext context, String text) {
   ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()
     ..showSnackBar(SnackBar(content: Text(text)));
+}
+
+class CopyIconButton extends StatelessWidget {
+  const CopyIconButton({
+    super.key,
+    required this.value,
+    required this.label,
+    this.color = AppColors.textSecondary,
+  });
+
+  final String value;
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      tooltip: 'Copy $label',
+      visualDensity: VisualDensity.compact,
+      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+      padding: EdgeInsets.zero,
+      iconSize: 18,
+      color: color,
+      icon: const Icon(Icons.copy_rounded),
+      onPressed: () async {
+        await Clipboard.setData(ClipboardData(text: value));
+        if (context.mounted) showMessage(context, '$label copied');
+      },
+    );
+  }
 }

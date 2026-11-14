@@ -305,6 +305,7 @@ class OrderCard extends StatelessWidget {
                   ),
                 ),
               ),
+              CopyIconButton(value: order.orderNumber, label: 'Order number'),
               StatusChip(
                 label: orderStatusLabel(order.status),
                 color: orderStatusColor(order.status),

@@ -104,6 +104,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   ),
                 ),
               ),
+              CopyIconButton(value: o.orderNumber, label: 'Order number'),
               StatusChip(
                 label: orderStatusLabel(o.status),
                 color: orderStatusColor(o.status),

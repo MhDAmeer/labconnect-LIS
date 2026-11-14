@@ -16,7 +16,6 @@ import 'features/shell/app_shell.dart';
 import 'state/session_controller.dart';
 import 'widgets/common_widgets.dart';
 
-/// Builds the object graph once and starts the app.
 ///
 ///   TokenStorage -> ApiClient -> repositories -> SessionController
 class LabConnectApp extends StatefulWidget {

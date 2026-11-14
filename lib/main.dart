@@ -8,9 +8,7 @@ import 'app.dart';
 import 'core/utils/formatters.dart';
 
 Future<void> main() async {
-  // Anything that escapes the framework ends up here. It is deliberately
-  // not printed: error text can contain patient data, and the guide says
-  // nothing sensitive may go to logs or crash reports.
+
   await runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
 

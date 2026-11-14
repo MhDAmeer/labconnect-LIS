@@ -1,18 +1,4 @@
 #!/usr/bin/env python3
-"""Patches the Android/iOS folders that `flutter create` generates.
-
-Run from the project root (setup.sh does this for you):
-    python3 tool/setup_platforms.py
-
-What it changes, and why:
-  * AndroidManifest.xml  - INTERNET permission (release builds have none by
-    default), allowBackup=false (keeps tokens out of device backups) and
-    the app label.
-  * android/app/build.gradle(.kts) - minSdk 23, needed by the encrypted
-    secure storage.
-  * ios/Runner/Info.plist - app display name.
-Each step is skipped if it was already applied, so it is safe to re-run.
-"""
 import pathlib
 import re
 import sys
